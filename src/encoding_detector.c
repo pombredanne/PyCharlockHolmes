@@ -150,18 +150,30 @@ PyObject *
 charlockholmes_encoding_detect(PyObject *self, PyObject *args, PyObject *keywds)
 {
     PyObject *content;
+    PyObject *hint_enc;
     UErrorCode status = U_ZERO_ERROR;
     const UCharsetMatch *match;
     const char *mname;
     const char *mlang;
-    int mconfidence;
+    int mconfidence, strip_tags;
 
-    if (!PyArg_ParseTuple(args, "S", &content)) {
+    static char *kwlist[] = { "str", "hint_enc", "strip_tags", NULL };
+
+    if (!PyArg_ParseTuple(args, "S|Si", &content, &hint_enc, &strip_tags)) {
         return NULL;
     }
 
     if (detect_binary_content(content)) {
         return Py_BuildValue("{ss,si}", "type", "binary", "confidence", 100);
+    }
+
+    if (strip_tags != NULL) {
+        //strip_tags = strip_tags == 1 ? 1 : 0;
+        ucsdet_enableInputFilter(ch_ucd, strip_tags);
+    }
+
+    if (PyString_AsString(hint_enc)) {
+        ucsdet_setDeclaredEncoding(ch_ucd, PyString_AsString(hint_enc), (int32_t)PyString_Size(hint_enc), &status);
     }
 
     ucsdet_setText(ch_ucd, PyString_AsString(content), (int32_t)PyString_Size(content), &status);
