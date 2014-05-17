@@ -5,6 +5,19 @@
 static magic_t ch_magic;
 static UCharsetDetector *ch_ucd;
 
+/*
+static int detect_binary_content(PyObject *content) {
+    const char *binary_result;
+    binary_result = magic_buffer(ch_magic, PyString_AsString(content), PyString_Size(content));
+    if (binary_result) {
+        if (!strstr(binary_result, "text")) {
+            return 1;
+        }
+    }
+    return 0;
+}
+*/
+
 static int detect_binary_content(PyObject *content) {
     const char *buf;
     size_t buf_len, max_scan_len;
@@ -147,19 +160,18 @@ charlockholmes_get_supported_encodings(PyObject *self)
  * Returns: a dict with encoding, language, type and confidence parameters
  */
 PyObject *
-charlockholmes_encoding_detect(PyObject *self, PyObject *args, PyObject *keywds)
+charlockholmes_encoding_detect(PyObject *self, PyObject *args)
 {
     PyObject *content;
-    PyObject *hint_enc;
+    //PyObject *hint_enc;
     UErrorCode status = U_ZERO_ERROR;
     const UCharsetMatch *match;
     const char *mname;
     const char *mlang;
-    int mconfidence, strip_tags;
+    const char *hint_enc;
+    int mconfidence;
 
-    static char *kwlist[] = { "str", "hint_enc", "strip_tags", NULL };
-
-    if (!PyArg_ParseTuple(args, "S|Si", &content, &hint_enc, &strip_tags)) {
+    if (!PyArg_ParseTuple(args, "S|s", &content, &hint_enc)) {
         return NULL;
     }
 
@@ -167,13 +179,9 @@ charlockholmes_encoding_detect(PyObject *self, PyObject *args, PyObject *keywds)
         return Py_BuildValue("{ss,si}", "type", "binary", "confidence", 100);
     }
 
-    if (strip_tags != NULL) {
-        //strip_tags = strip_tags == 1 ? 1 : 0;
-        ucsdet_enableInputFilter(ch_ucd, strip_tags);
-    }
-
-    if (PyString_AsString(hint_enc)) {
-        ucsdet_setDeclaredEncoding(ch_ucd, PyString_AsString(hint_enc), (int32_t)PyString_Size(hint_enc), &status);
+    if (hint_enc != NULL) {
+        //ucsdet_setDeclaredEncoding(ch_ucd, PyString_AsString(hint_enc), (int32_t)PyString_Size(hint_enc), &status);
+        ucsdet_setDeclaredEncoding(ch_ucd, hint_enc, strlen(hint_enc), &status);
     }
 
     ucsdet_setText(ch_ucd, PyString_AsString(content), (int32_t)PyString_Size(content), &status);
@@ -213,19 +221,20 @@ charlockholmes_encoding_detect(PyObject *self, PyObject *args, PyObject *keywds)
  *          parameters
  */
 PyObject *
-charlockholmes_encoding_detect_all(PyObject *self,
-        PyObject *args, PyObject *keywds)
+charlockholmes_encoding_detect_all(PyObject *self, PyObject *args)
 {
     PyObject *lst;
     PyObject *content;
+    //PyObject *hint_enc;
     UErrorCode status = U_ZERO_ERROR;
     const UCharsetMatch **matches;
     const char *mname;
     const char *mlang;
+    const char *hint_enc;
     int mconfidence;
     int i, match_count;
 
-    if (!PyArg_ParseTuple(args, "S", &content)) {
+    if (!PyArg_ParseTuple(args, "S|s", &content, &hint_enc)) {
         return NULL;
     }
 
@@ -237,6 +246,11 @@ charlockholmes_encoding_detect_all(PyObject *self,
         content = Py_BuildValue("{ss,si}", "type", "binary", "confidence", 100);
         PyList_SET_ITEM(lst, 0, content);
         return lst;
+    }
+
+    if (hint_enc != NULL) {
+        //ucsdet_setDeclaredEncoding(ch_ucd, PyString_AsString(hint_enc), (int32_t)PyString_Size(hint_enc), &status);
+        ucsdet_setDeclaredEncoding(ch_ucd, hint_enc, strlen(hint_enc), &status);
     }
 
     ucsdet_setText(ch_ucd, PyString_AsString(content), (int32_t)PyString_Size(content), &status);
@@ -273,3 +287,35 @@ charlockholmes_encoding_detect_all(PyObject *self,
     return Py_None;
 }
 
+/*
+ * Returns whether or not the strip_tags flag is set on this detector
+ *
+ * Returns: Boolean
+ */
+PyObject *
+charlockholmes_get_strip_tags(PyObject *self)
+{
+	return PyBool_FromLong(ucsdet_isInputFilterEnabled(ch_ucd));
+}
+
+/*
+ * Enable or disable the stripping of HTML/XML tags from the input before
+ * attempting any detection
+ *
+ * Returns: Boolean, the value passed
+ */
+PyObject *
+charlockholmes_set_strip_tags(PyObject *self, PyObject *args)
+{
+    int val;
+
+    if (!PyArg_ParseTuple(args, "i", &val)) {
+        return NULL;
+    }
+
+	val = val > 0 ? 1 : 0;
+
+	ucsdet_enableInputFilter(ch_ucd, val);
+
+	return PyBool_FromLong(val);
+}

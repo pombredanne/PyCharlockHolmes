@@ -5,7 +5,10 @@
 #
 
 import unittest
-from pycharlockholmes import detect, get_supported_encodings, detect_all
+from pycharlockholmes import (
+    detect, get_supported_encodings, detect_all,
+    set_strip_tags, get_strip_tags
+)
 
 
 class EncodingDetectorTest(unittest.TestCase):
@@ -121,16 +124,21 @@ class EncodingDetectorTest(unittest.TestCase):
         detected_list = detect_all(content, 'UTF-8')
 
         self.assertIsInstance(detected_list, list)
-        self.assertEqual(['ISO-8859-1', 'ISO-8859-2', 'UTF-8'], detected_list)
+        encodings_list = [x['encoding'] for x in detected_list]
+        self.assertEqual(['ISO-8859-1', 'ISO-8859-2', 'UTF-8'], encodings_list)
 
     def test_strip_tags_flag(self):
         content = '<div ascii_attribute="some more ascii">λ, λ, λ</div>'
-        detection = detect(content, strip_tags=True)
+        set_strip_tags(True)
+        detection = detect(content)
+        self.assertEqual(get_strip_tags(), True)
 
         self.assertEqual('UTF-8', detection['encoding'])
 
         content2 = '<div ascii_attribute="some more ascii">λ, λ, λ</div>'
-        detection2 = detect(content2, strip_tags=False)
+        set_strip_tags(False)
+        detection2 = detect(content2)
+        self.assertEqual(get_strip_tags(), False)
 
         self.assertEqual('UTF-8', detection2['encoding'])
 
