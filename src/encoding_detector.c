@@ -21,7 +21,6 @@ static int detect_binary_content(PyObject *content) {
 static int detect_binary_content(PyObject *content) {
     const char *buf;
     size_t buf_len, max_scan_len;
-    int i;
 
     buf = PyString_AsString(content);
     buf_len = PyString_Size(content);
@@ -85,10 +84,18 @@ static int detect_binary_content(PyObject *content) {
         max_scan_len = buf_len;
     }
 
+    /*
+    int i;
 	for (i=0; i<max_scan_len; i++)
 	{
-		if (buf[i] == NULL)
+		if (buf[i] == NULL) {
             return 1;
+        }
+	}
+	*/
+
+	if (strlen(buf) != buf_len) {
+	    return 1;
 	}
 
     return 0;
@@ -163,12 +170,11 @@ PyObject *
 charlockholmes_encoding_detect(PyObject *self, PyObject *args)
 {
     PyObject *content;
-    //PyObject *hint_enc;
     UErrorCode status = U_ZERO_ERROR;
     const UCharsetMatch *match;
     const char *mname;
     const char *mlang;
-    const char *hint_enc;
+    const char *hint_enc = NULL;
     int mconfidence;
 
     if (!PyArg_ParseTuple(args, "S|s", &content, &hint_enc)) {
@@ -180,7 +186,6 @@ charlockholmes_encoding_detect(PyObject *self, PyObject *args)
     }
 
     if (hint_enc != NULL) {
-        //ucsdet_setDeclaredEncoding(ch_ucd, PyString_AsString(hint_enc), (int32_t)PyString_Size(hint_enc), &status);
         ucsdet_setDeclaredEncoding(ch_ucd, hint_enc, strlen(hint_enc), &status);
     }
 
@@ -225,12 +230,11 @@ charlockholmes_encoding_detect_all(PyObject *self, PyObject *args)
 {
     PyObject *lst;
     PyObject *content;
-    //PyObject *hint_enc;
     UErrorCode status = U_ZERO_ERROR;
     const UCharsetMatch **matches;
     const char *mname;
     const char *mlang;
-    const char *hint_enc;
+    const char *hint_enc = NULL;
     int mconfidence;
     int i, match_count;
 
@@ -249,7 +253,6 @@ charlockholmes_encoding_detect_all(PyObject *self, PyObject *args)
     }
 
     if (hint_enc != NULL) {
-        //ucsdet_setDeclaredEncoding(ch_ucd, PyString_AsString(hint_enc), (int32_t)PyString_Size(hint_enc), &status);
         ucsdet_setDeclaredEncoding(ch_ucd, hint_enc, strlen(hint_enc), &status);
     }
 

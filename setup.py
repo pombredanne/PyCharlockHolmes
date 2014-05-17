@@ -1,6 +1,9 @@
 from distutils.core import setup, Extension
 import os
 
+#os.environ["CC"] = "clang"
+#os.environ["CXX"] = "clang++"
+
 # Use environment variable ICUI18N to set your own icui18n configuration.
 icui18n_path = os.getenv("ICUI18N")
 if icui18n_path is None:

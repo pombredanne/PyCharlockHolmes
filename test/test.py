@@ -4,11 +4,14 @@
 # Test pycharlockholmes
 #
 
+import os
 import unittest
 from pycharlockholmes import (
     detect, get_supported_encodings, detect_all,
     set_strip_tags, get_strip_tags
 )
+
+TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class EncodingDetectorTest(unittest.TestCase):
@@ -147,6 +150,40 @@ class EncodingDetectorTest(unittest.TestCase):
 
         self.assertTrue(isinstance(supported_encodings, tuple))
         self.assertTrue('UTF-8' in supported_encodings)
+
+    def test_binary(self):
+        binary_files = [
+            'octocat.ai',
+            'octocat.png',
+            'octocat.psd',
+            'zip',
+            'cube.stl',
+            'dog.o',
+            'foo.bin',
+            'foo.pdf',
+            'foo.png',
+            'foo bar.jar',
+            'git.deb',
+            'git.exe',
+            'github.po',
+            'hello.pbc',
+            'linguist.gem'
+        ]
+        binary_bin = '%s/binary' % TEST_DIR
+
+        def get_detection(binary_file):
+            path = '%s/%s' % (binary_bin, binary_file)
+
+            detected = detect(open(path).read())
+            return detected
+
+        self.assertEqual(get_detection('git.deb')['type'], 'binary')
+        self.assertEqual(get_detection('git.exe')['type'], 'binary')
+        self.assertEqual(get_detection('hello.pbc')['type'], 'binary')
+        self.assertEqual(get_detection('linguist.gem')['type'], 'binary')
+        self.assertEqual(get_detection('octocat.ai')['type'], 'binary')
+        self.assertEqual(get_detection('octocat.png')['type'], 'binary')
+        self.assertEqual(get_detection('github.po')['type'], 'text')
 
 if __name__ == '__main__':
     unittest.main()
