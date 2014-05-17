@@ -36,7 +36,7 @@ ch_module = Extension('pycharlockholmes',
 
 setup (
     name='pycharlockholmes',
-    version='0.0.3',
+    version='0.0.4',
     description='Character encoding detecting library for Python using '
                 'ICU and libmagic. Based on Ruby '
                 'implementation https://github.com/brianmario/charlock_holmes '
