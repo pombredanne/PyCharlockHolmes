@@ -115,7 +115,7 @@ class EncodingDetectorTest(unittest.TestCase):
         content = 'test'
         detected_list = detect_all(content)
 
-        self.assertIsInstance(detected_list, list)
+        self.assertTrue(isinstance(detected_list, list))
         encodings_list = [x['encoding'] for x in detected_list]
         self.assertEqual(['ISO-8859-1', 'ISO-8859-2', 'UTF-8'], encodings_list)
 
@@ -123,7 +123,7 @@ class EncodingDetectorTest(unittest.TestCase):
         content = 'test'
         detected_list = detect_all(content, 'UTF-8')
 
-        self.assertIsInstance(detected_list, list)
+        self.assertTrue(isinstance(detected_list, list))
         encodings_list = [x['encoding'] for x in detected_list]
         self.assertEqual(['ISO-8859-1', 'ISO-8859-2', 'UTF-8'], encodings_list)
 
@@ -145,7 +145,7 @@ class EncodingDetectorTest(unittest.TestCase):
     def test_has_list_of_supported_encodings(self):
         supported_encodings = get_supported_encodings()
 
-        self.assertIsInstance(supported_encodings, tuple)
+        self.assertTrue(isinstance(supported_encodings, tuple))
         self.assertTrue('UTF-8' in supported_encodings)
 
 if __name__ == '__main__':
