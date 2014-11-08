@@ -1,6 +1,9 @@
 from distutils.core import setup, Extension
 import os
 
+#os.environ["CC"] = "clang"
+#os.environ["CXX"] = "clang++"
+
 # Use environment variable ICUI18N to set your own icui18n configuration.
 icui18n_path = os.getenv("ICUI18N")
 if icui18n_path is None:
@@ -25,20 +28,23 @@ ch_exts = [
 ]
 
 # ch_module = Extension('charlockholmes', ch_exts, include_dirs=['./lib/magic/include'], library_dirs=['./lib/magic/lib'], libraries=['icui18n'])
-ch_module = Extension('charlockholmes',
+ch_module = Extension('pycharlockholmes',
                       ch_exts,
                       include_dirs=[icui18n_include, magic_include],
                       library_dirs=[icui18n_lib, magic_lib],
                       libraries=['icui18n', 'magic'])
 
 setup (
-    name='charlockholmes',
-    version='0.0.2',
-    description='Character encoding detecting library for Python using ICU and libmagic.',
-    url='https://github.com/xtao/PyCharlockHolmes',
+    name='pycharlockholmes',
+    version='0.0.4',
+    description='Character encoding detecting library for Python using '
+                'ICU and libmagic. Based on Ruby '
+                'implementation https://github.com/brianmario/charlock_holmes '
+                'and work of https://github.com/xtao/PyCharlockHolmes',
+    url='https://github.com/kkszysiu/pycharlockholmes',
     ext_modules=[ch_module],
-    keywords=('icu', 'magic', 'charlockholmes', 'egg'),
+    keywords=('icu', 'magic', 'charlockholmes', 'egg', 'mime', 'libmagic'),
     license='Modified BSD License',
-    author='xtao',
-    author_email='xutao881001@gmail.com',
+    author='Krzysztof "kkszysiu" Klinikowski',
+    author_email='kkszysiu@gmail.com',
 )

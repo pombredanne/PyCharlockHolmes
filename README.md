@@ -1,5 +1,5 @@
-# Charlock Holmes
-[![Build Status](https://travis-ci.org/xtao/PyCharlockHolmes.png)](https://travis-ci.org/xtao/PyCharlockHolmes)
+# pycharlockholmes
+[![Build Status](https://travis-ci.org/kkszysiu/pycharlockholmes.png)](https://travis-ci.org/kkszysiu/pycharlockholmes.png)
 
 Character encoding detecting library for Python using [ICU](http://site.icu-project.org/) and libmagic. Inspired by [Charlock Holmes](https://raw.github.com/brianmario/charlock_holmes)
 
