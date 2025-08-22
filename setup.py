@@ -1,5 +1,11 @@
-from distutils.core import setup, Extension
+from setuptools import setup, Extension, find_packages
 import os
+from os import path
+
+here = path.abspath(path.dirname(__file__))
+# Get the long description from the README file
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 # Use environment variable ICUI18N to set your own icui18n configuration.
 icui18n_path = os.getenv("ICUI18N")
@@ -33,11 +39,12 @@ ch_module = Extension('charlockholmes',
 
 setup (
     name='charlockholmes',
-    version='0.0.2',
+    version='0.0.3',
     description='Character encoding detecting library for Python using ICU and libmagic.',
-    url='https://github.com/xtao/PyCharlockHolmes',
+    long_description=long_description,
+    url='https://github.com/douban/PyCharlockHolmes',
     ext_modules=[ch_module],
-    keywords=('icu', 'magic', 'charlockholmes', 'egg'),
+    keywords=['icu', 'magic', 'charlockholmes', 'egg'],
     license='Modified BSD License',
     author='xtao',
     author_email='xutao881001@gmail.com',
